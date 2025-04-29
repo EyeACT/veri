@@ -2,159 +2,75 @@
 import { ref } from "vue";
 import { invoke } from "@tauri-apps/api/core";
 
-const greetMsg = ref("");
-const name = ref("");
+const activeTab = ref("verify");
+const selectedFolder = ref("");
 
-async function greet() {
-  // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
-  greetMsg.value = await invoke("greet", { name: name.value });
+async function selectFolder() {
+  // This will be implemented later to handle folder selection
+  console.log("Folder selection will be implemented");
 }
 </script>
 
 <template>
-  <main class="container">
-    <h1>Welcome to Tauri + Vue</h1>
-
-    <div class="row">
-      <a href="https://vitejs.dev" target="_blank">
-        <img src="/vite.svg" class="logo vite" alt="Vite logo" />
-      </a>
-      <a href="https://tauri.app" target="_blank">
-        <img src="/tauri.svg" class="logo tauri" alt="Tauri logo" />
-      </a>
-      <a href="https://vuejs.org/" target="_blank">
-        <img src="./assets/vue.svg" class="logo vue" alt="Vue logo" />
-      </a>
+  <div class="flex h-screen w-screen overflow-hidden">
+    <!-- Sidebar -->
+    <div class="w-64 bg-gray-800 text-white p-5 flex flex-col fixed h-full">
+      <div class="mb-10">
+        <h2 class="text-2xl font-bold text-cyan-400">Veri</h2>
+      </div>
+      <div class="flex flex-col gap-2">
+        <button
+          class="px-5 py-3 text-left rounded-md transition-colors"
+          :class="[
+            activeTab === 'verify'
+              ? 'bg-cyan-500 text-gray-800'
+              : 'hover:bg-gray-700',
+          ]"
+          @click="activeTab = 'verify'"
+        >
+          Verify
+        </button>
+        <button
+          class="px-5 py-3 text-left rounded-md opacity-50 cursor-not-allowed"
+          :class="[
+            activeTab === 'upload'
+              ? 'bg-cyan-500 text-gray-800'
+              : 'hover:bg-gray-700',
+          ]"
+          disabled
+        >
+          Upload
+        </button>
+      </div>
     </div>
-    <p>Click on the Tauri, Vite, and Vue logos to learn more.</p>
 
-    <form class="row" @submit.prevent="greet">
-      <input id="greet-input" v-model="name" placeholder="Enter a name..." />
-      <button type="submit">Greet</button>
-    </form>
-    <p>{{ greetMsg }}</p>
-  </main>
+    <!-- Main Content -->
+    <div
+      class="flex-1 ml-64 p-10 bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 overflow-y-auto"
+    >
+      <div v-if="activeTab === 'verify'" class="max-w-3xl mx-auto">
+        <h1 class="text-3xl font-bold mb-10">Verify Folder Structure</h1>
+        <div class="text-center">
+          <button
+            @click="selectFolder"
+            class="px-6 py-3 bg-cyan-500 text-white rounded-md hover:bg-cyan-600 transition-colors"
+          >
+            Select Folder
+          </button>
+          <p
+            v-if="selectedFolder"
+            class="mt-5 p-3 bg-gray-200 dark:bg-gray-700 rounded-md break-all"
+          >
+            Selected: {{ selectedFolder }}
+          </p>
+        </div>
+      </div>
+      <div v-else-if="activeTab === 'upload'" class="max-w-3xl mx-auto">
+        <h1 class="text-3xl font-bold mb-5">Upload (Coming Soon)</h1>
+        <p class="text-gray-600 dark:text-gray-400">
+          This feature will be available in a future update.
+        </p>
+      </div>
+    </div>
+  </div>
 </template>
-
-<style scoped>
-.logo.vite:hover {
-  filter: drop-shadow(0 0 2em #747bff);
-}
-
-.logo.vue:hover {
-  filter: drop-shadow(0 0 2em #249b73);
-}
-
-</style>
-<style>
-:root {
-  font-family: Inter, Avenir, Helvetica, Arial, sans-serif;
-  font-size: 16px;
-  line-height: 24px;
-  font-weight: 400;
-
-  color: #0f0f0f;
-  background-color: #f6f6f6;
-
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  -webkit-text-size-adjust: 100%;
-}
-
-.container {
-  margin: 0;
-  padding-top: 10vh;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  text-align: center;
-}
-
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: 0.75s;
-}
-
-.logo.tauri:hover {
-  filter: drop-shadow(0 0 2em #24c8db);
-}
-
-.row {
-  display: flex;
-  justify-content: center;
-}
-
-a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
-}
-
-a:hover {
-  color: #535bf2;
-}
-
-h1 {
-  text-align: center;
-}
-
-input,
-button {
-  border-radius: 8px;
-  border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
-  font-weight: 500;
-  font-family: inherit;
-  color: #0f0f0f;
-  background-color: #ffffff;
-  transition: border-color 0.25s;
-  box-shadow: 0 2px 2px rgba(0, 0, 0, 0.2);
-}
-
-button {
-  cursor: pointer;
-}
-
-button:hover {
-  border-color: #396cd8;
-}
-button:active {
-  border-color: #396cd8;
-  background-color: #e8e8e8;
-}
-
-input,
-button {
-  outline: none;
-}
-
-#greet-input {
-  margin-right: 5px;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    color: #f6f6f6;
-    background-color: #2f2f2f;
-  }
-
-  a:hover {
-    color: #24c8db;
-  }
-
-  input,
-  button {
-    color: #ffffff;
-    background-color: #0f0f0f98;
-  }
-  button:active {
-    background-color: #0f0f0f69;
-  }
-}
-
-</style>
