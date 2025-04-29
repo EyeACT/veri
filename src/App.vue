@@ -5,9 +5,26 @@ import { invoke } from "@tauri-apps/api/core";
 const activeTab = ref("verify");
 const selectedFolder = ref("");
 
-async function selectFolder() {
-  // This will be implemented later to handle folder selection
-  console.log("Folder selection will be implemented");
+async function selectFolder(event: Event) {
+  console.log(event);
+  const input = event.target as HTMLInputElement;
+  if (!input.files || input.files.length === 0) {
+    console.log("No files selected");
+    return;
+  }
+
+  // Get the first file's path (which will be the folder path)
+  const folderPath = input.files[0].webkitRelativePath.split("/")[0];
+  console.log("Selected folder path:", folderPath);
+
+  try {
+    selectedFolder.value = await invoke("open_folder", {
+      path: folderPath,
+    });
+    console.log("Folder path from backend:", selectedFolder.value);
+  } catch (error) {
+    console.error("Error opening folder:", error);
+  }
 }
 </script>
 
@@ -51,12 +68,22 @@ async function selectFolder() {
       <div v-if="activeTab === 'verify'" class="max-w-3xl mx-auto">
         <h1 class="text-3xl font-bold mb-10">Verify Folder Structure</h1>
         <div class="text-center">
-          <button
-            @click="selectFolder"
-            class="px-6 py-3 bg-cyan-500 text-white rounded-md hover:bg-cyan-600 transition-colors"
+          <input
+            type="file"
+            @change="selectFolder"
+            webkitdirectory
+            directory
+            multiple
+            class="hidden"
+            id="folderInput"
+          />
+          <label
+            for="folderInput"
+            class="px-6 py-3 bg-cyan-500 text-white rounded-md hover:bg-cyan-600 transition-colors cursor-pointer inline-block"
           >
             Select Folder
-          </button>
+          </label>
+
           <p
             v-if="selectedFolder"
             class="mt-5 p-3 bg-gray-200 dark:bg-gray-700 rounded-md break-all"
